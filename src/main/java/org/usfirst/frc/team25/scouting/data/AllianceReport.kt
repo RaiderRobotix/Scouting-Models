@@ -86,16 +86,19 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
      * an alliance.
      */
     private fun calculateExpectedValues() {
-        val metricSets = arrayOf(TeamReport.autoMetricNames, TeamReport.teleMetricNames,
-                TeamReport.overallMetricNames)
+        val metricSets = arrayOf(
+	        TeamReport.autoMetrics,
+	        TeamReport.teleMetrics,
+	        TeamReport.overallMetrics
+        )
         val prefixes = arrayOf("auto", "tele", "")
         for (i in metricSets.indices) {
             for (metric in metricSets[i]) {
                 var expectedValue = 0.0
                 for (report in teamReports) {
-                    expectedValue += report.getAverage(prefixes[i] + metric)
+                    expectedValue += report.getAverage(prefixes[i] + metric.name)
                 }
-                expectedValues[prefixes[i] + metric] = expectedValue
+                expectedValues[prefixes[i] + metric.name] = expectedValue
             }
         }
     }
@@ -403,8 +406,11 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
      * particular match
      */
     private fun calculateMonteCarloExpectedValues(testSets: ArrayList<HashMap<String, Double>>) { // Creates a list of all average value metrics for a team, used to calculated an alliance expected value
-        val metricSets = arrayOf(TeamReport.autoMetricNames, TeamReport.teleMetricNames,
-                TeamReport.overallMetricNames)
+        val metricSets = arrayOf(
+	        TeamReport.autoMetrics,
+	        TeamReport.teleMetrics,
+	        TeamReport.overallMetrics
+        )
         val prefixes = arrayOf("auto", "tele", "")
         // Iterate through various metric names
         for (i in metricSets.indices) {
@@ -412,9 +418,10 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
                 var value = 0.0
                 // Iterate through each team in the alliance
                 for (testSet in testSets) {
-                    value += testSet[prefixes[i] + metric]!!
+	                val e = prefixes[i] + metric
+                    value += testSet[prefixes[i] + metric.name]!!
                 }
-                expectedValues[prefixes[i] + metric] = value
+                expectedValues[prefixes[i] + metric.name] = value
             }
         }
     }

@@ -149,27 +149,6 @@ class TeamReport(val teamNum: Int) {
 	}
 	
 	/**
-	 * Finds the endgame HAB climb level for this team that results in the greatest expected endgame contribution
-	 * Expected contribution is equal to the team's attempt-success rate for climbing a particular HAB level
-	 * multiplied by the point value of that level
-	 *
-	 * @return The HAB climb level that yields the greatest expected contribution, 3 if the team has not climbed before
-	 */
-	val bestClimbLevel: Int by lazy {
-		var bestLevel = 0
-		var bestClimbPoints = 0.0
-		val climbPointValues = intArrayOf(3, 6, 12)
-		for (i in 0..2) {
-			val potentialPoints = attemptSuccessRates[levelPrefixes[i] + "Climb"]!! * climbPointValues[i]
-			if (potentialPoints >= bestClimbPoints) {
-				bestClimbPoints = potentialPoints
-				bestLevel = i + 1
-			}
-		}
-		bestLevel
-	}
-	
-	/**
 	 * Generates a random sample of various metrics computed in `averages`, assuming a Normal distribution
 	 * with standard deviations specified by the team's `standardDeviations`
 	 *
@@ -248,17 +227,26 @@ class TeamReport(val teamNum: Int) {
 	
 	companion object {
 		// Metric defined to assist with iterating over values
-		private val autoMetrics = arrayOf(
+		val autoMetrics = arrayOf(
 			Autonomous::cellsScoredBottom,
 			Autonomous::cellsScoredOuter,
 			Autonomous::cellsScoredInner,
 			Autonomous::crossInitLine
 		)
-		val teleMetricNames = arrayOf("cargoShipHatches", "rocketLevelOneHatches",
-			"rocketLevelTwoHatches", "rocketLevelThreeHatches", "cargoShipCargo", "rocketLevelOneCargo",
-			"rocketLevelTwoCargo", "rocketLevelThreeCargo", "numPartnerClimbAssists")
-		val overallMetricNames = arrayOf("calculatedPointContribution",
-			"calculatedSandstormPoints", "calculatedTeleOpPoints", "totalHatches", "totalCargo")
+		val teleMetrics = arrayOf(
+			TeleOp::cellsDropped,
+			TeleOp::cellsScoredBottom,
+			TeleOp::cellsScoredOuter,
+			TeleOp::cellsScoredInner,
+			TeleOp::rotationControl,
+			TeleOp::positionControl,
+			TeleOp::successHang
+		)
+		val overallMetrics = arrayOf(
+			ScoutEntry::cellsDropped,
+			ScoutEntry::cycles,
+			ScoutEntry::pointContribution
+		)
 	}
 	
 }
