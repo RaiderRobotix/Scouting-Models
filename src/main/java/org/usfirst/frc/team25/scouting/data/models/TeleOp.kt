@@ -15,11 +15,11 @@ data class TeleOp(
 	val cellPickupRpoint: Int,
 	val cellPickupTrench: Int,
 	val cellsDropped: Int,
-	val isRotationControl: Boolean,
-	val isPositionControl: Boolean,
-	val isAttemptHang: Boolean,
-	val isSuccessHang: Boolean,
-	val isHangAssisted: Boolean,
+	val rotationControl: Boolean,
+	val positionControl: Boolean,
+	val attemptHang: Boolean,
+	val successHang: Boolean,
+	val hangAssisted: Boolean,
 	val assistingClimbTeamNum: Int,
 	val numPartnerClimbAssists: Int
 )
