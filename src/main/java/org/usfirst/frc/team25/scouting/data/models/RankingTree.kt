@@ -11,14 +11,13 @@ import java.util.stream.Collectors
  * improved comparison picklist during Summer 2018
  */
 class RankingTree {
-	private var ranks = HashMap<Int, Int?>()
+	private var ranks = HashMap<Int, Int>()
 	/**
 	 * @return The maximum level of among all nodes in the tree
 	 */
 	var maxLevel = 0
 		private set
 
-	constructor() {}
 	/**
 	 * Initializes a RankingTree in which the each element of teamOrder is a numbered node,
 	 * where the first element has the highest level and the last element has the lowest
@@ -29,10 +28,6 @@ class RankingTree {
 		for (i in teamOrder.indices) {
 			ranks[teamOrder[i]] = teamOrder.size - i
 		}
-	}
-
-	constructor(ranks: HashMap<Int, Int?>) {
-		this.ranks = ranks
 	}
 
 	/**
@@ -46,8 +41,7 @@ class RankingTree {
 	 * Useful for creating a duplicate tree for backup.
 	 */
 	val treeHashMap: HashMap<Int, Int>
-		get() = ranks.entries.stream()
-			.collect(Collectors.toMap<Map.Entry<Int, Int?>, Int, Int>({ java.util.Map.Entry.key }) { java.util.Map.Entry.value }) as HashMap<Int, Int>
+		get() = ranks.clone() as HashMap<Int, Int>
 
 	/**
 	 * Creates a new node at level 0
@@ -141,7 +135,7 @@ class RankingTree {
 	 * a node on each line, followed by a comma and its level
 	 */
 	override fun toString(): String {
-		ranks = sortByValue<Int, Int?>(ranks)
+		ranks = sortByValue<Int, Int>(ranks)
 		val result = StringBuilder()
 		for ((key, value) in ranks) {
 			try {
@@ -160,7 +154,7 @@ class RankingTree {
 	 */
 	fun toArrayList(): ArrayList<Int> {
 		val result = ArrayList<Int>()
-		ranks = sortByValue<Int, Int?>(ranks)
+		ranks = sortByValue<Int, Int>(ranks)
 		for ((key) in ranks) {
 			try {
 				result.add(key)
