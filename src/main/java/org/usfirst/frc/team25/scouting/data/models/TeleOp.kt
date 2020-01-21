@@ -1,9 +1,5 @@
 package org.usfirst.frc.team25.scouting.data.models
 
-import lombok.Data
-import lombok.experimental.Accessors
-
-
 /**
  * Container holding data from the tele-operated period
  * Includes endgame data

@@ -128,8 +128,8 @@ public class EventReport {
             entryContents.append('\n');
             fileContents.append(entryContents);
 
-            if (!entry.getPreMatch().isRobotNoShow()) {
-                noShowFileContents.append(entryContents);
+            if (!entry.getPreMatch().getNoShow()) {
+	            noShowFileContents.append(entryContents);
             }
         }
 

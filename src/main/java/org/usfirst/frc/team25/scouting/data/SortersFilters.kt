@@ -18,7 +18,7 @@ object SortersFilters {
 		val entries = Vector(unsorted.entries)
 		entries.sortWith(java.util.Map.Entry.comparingByValue())
 		val sorted = LinkedHashMap<K, V>()
-		entries.forEach(Consumer { it: Map.Entry<K, V> -> sorted[it.key] = it.value })
+		entries.forEach(Consumer { sorted[it.key] = it.value })
 		return sorted
 	}
 }

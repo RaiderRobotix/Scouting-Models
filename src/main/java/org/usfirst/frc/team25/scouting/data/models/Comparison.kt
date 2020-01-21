@@ -1,8 +1,5 @@
 package org.usfirst.frc.team25.scouting.data.models
 
-import lombok.Data
-import lombok.experimental.Accessors
-
 /**
  * Class that holds a comparison between two teams
  */

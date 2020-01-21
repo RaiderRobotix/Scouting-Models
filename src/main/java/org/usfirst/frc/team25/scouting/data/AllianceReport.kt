@@ -6,18 +6,26 @@ import kotlin.math.sqrt
 
 /**
  * Class for alliance-based calculations, stats, and predictions
+ * @param teamReports An array of team reports that a part of the alliance. If this contains less than three team
+ * reports, "dummy" alliance partners will be created
  */
 class AllianceReport(teamReports: ArrayList<TeamReport>) {
-    val teamReports = teamReports.toTypedArray()
-    /**
-     * The confidence level of not reaching the scoring potential when computing the optimal number of null hatch panels
-     * E.g. A value of 0.8 means that an alliance would be able to score more, if they weren't "capped" by the null
-     * hatch panels, in 20% of the matches they play. Conversely, the number of hatch panels would benefit them in
-     * 80% of the matches they play. Note that if this value is low, the alliance may not be able to place hatch
-     * panels at a rate that matches their cargo cycling, thus also being detrimental.
-     */
-    private val NULL_HATCH_CONFIDENCE = 0.8
-    /**
+	
+	init {
+		require(teamReports.size == 3) { "teamReports must contains 3 report, no more, no less" }
+		calculateStats()
+	}
+	
+	val teamReports = teamReports.toTypedArray()
+	/**
+	 * The confidence level of not reaching the scoring potential when computing the optimal number of null hatch panels
+	 * E.g. A value of 0.8 means that an alliance would be able to score more, if they weren't "capped" by the null
+	 * hatch panels, in 20% of the matches they play. Conversely, the number of hatch panels would benefit them in
+	 * 80% of the matches they play. Note that if this value is low, the alliance may not be able to place hatch
+	 * panels at a rate that matches their cargo cycling, thus also being detrimental.
+	 */
+	private val NULL_HATCH_CONFIDENCE = 0.8
+	/**
      * The number of Monte Carlo simulation iterations to run to compute standard deviations of functions.
      * A larger number of iterations generally provides greater accuracy.
      */
@@ -418,7 +426,6 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
                 var value = 0.0
                 // Iterate through each team in the alliance
                 for (testSet in testSets) {
-	                val e = prefixes[i] + metric
                     value += testSet[prefixes[i] + metric.name]!!
                 }
                 expectedValues[prefixes[i] + metric.name] = value
@@ -646,17 +653,4 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
      * @return The metric's standard deviation in this alliance
      */
     fun getStandardDeviation(metric: String?): Double? = standardDeviations[metric]
-
-    /**
-     * Constructs a report to simulate an in-match alliance of three teams
-     *
-     * @param teamReports An array of team reports that a part of the alliance. If this contains less than three team
-     * reports, "dummy" alliance partners will be created
-     * @throws NullPointerException If `teamReports` is `null` or has a `null` team
-     * report as its first element
-     */
-    init {
-        require(teamReports.size == 3) { "teamReports must contains 3 report, no more, no less" }
-        calculateStats()
-    }
 }
