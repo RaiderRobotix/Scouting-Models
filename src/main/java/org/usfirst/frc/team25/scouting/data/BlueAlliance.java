@@ -1,7 +1,7 @@
 package org.usfirst.frc.team25.scouting.data;
 
-import Infinite_Recharge_Client.data.BuildConfig;
 import com.google.gson.Gson;
+import com.raiderrobotix.BuildConfig;
 import com.thebluealliance.api.v3.TBA;
 import com.thebluealliance.api.v3.models.Event;
 import com.thebluealliance.api.v3.models.Match;
@@ -11,8 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 
@@ -156,11 +158,10 @@ public class BlueAlliance {
 		final var nlJoiner = new StringJoiner(",\n");
 		final List<Match> matches;
 		try {
-			matches = Arrays.asList(TBA.eventRequest.getMatches(eventCode))
-				.stream()
-				.filter(m -> !m.getCompLevel().equals("qm"))
-				.sorted(SortersFilters.byMatchNum)
-				.collect(Collectors.toList());
+			matches = Arrays.stream(TBA.eventRequest.getMatches(eventCode))
+					.filter(m -> !m.getCompLevel().equals("qm"))
+					.sorted(SortersFilters.byMatchNum)
+					.collect(Collectors.toList());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -196,11 +197,10 @@ public class BlueAlliance {
 	 * @throws IOException if <code>outputDirectory</code> does not exist
 	 */
 	public static void downloadQualificationMatchData(String eventCode, File outputDirectory) throws IOException {
-		var matches = Arrays.asList(TBA.eventRequest.getMatches(eventCode))
-			.stream()
-			.filter(m -> !m.getCompLevel().equals("qm"))
-			.sorted(SortersFilters.byMatchNum)
-			.collect(Collectors.toList());
+		var matches = Arrays.stream(TBA.eventRequest.getMatches(eventCode))
+				.filter(m -> !m.getCompLevel().equals("qm"))
+				.sorted(SortersFilters.byMatchNum)
+				.collect(Collectors.toList());
 		Gson gson = new Gson();
 		String jsonString = gson.toJson(matches);
 		FileManager.outputFile(outputDirectory, "ScoreBreakdown - " + eventCode, "json", jsonString);

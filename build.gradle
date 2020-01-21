@@ -27,6 +27,7 @@ dependencies {
 }
 
 buildConfig {
+	packageName "com.raiderrobotix"
 	buildConfigField 'String', 'TBA_API_KEY', project['TBA_API_KEY']
 }
 
