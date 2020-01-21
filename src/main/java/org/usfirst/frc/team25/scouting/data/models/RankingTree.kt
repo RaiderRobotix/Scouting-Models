@@ -2,7 +2,7 @@ package org.usfirst.frc.team25.scouting.data.models
 
 import org.usfirst.frc.team25.scouting.data.SortersFilters.sortByValue
 import java.util.*
-import java.util.stream.Collectors
+import kotlin.collections.HashMap
 
 /**
  * Class representation of a tree with multiple nodes, each having a level that represents the position of a team on
@@ -10,39 +10,30 @@ import java.util.stream.Collectors
  * Note: This was not implemented when creating 2019 picklists and was mostly created as an experiment for an
  * improved comparison picklist during Summer 2018
  */
-class RankingTree {
+class RankingTree() : Cloneable {
 	private var ranks = HashMap<Int, Int>()
 	/**
 	 * @return The maximum level of among all nodes in the tree
 	 */
 	var maxLevel = 0
 		private set
-
+	
 	/**
 	 * Initializes a RankingTree in which the each element of teamOrder is a numbered node,
 	 * where the first element has the highest level and the last element has the lowest
 	 *
 	 * @param teamOrder An ArrayList that determines the levels and nodes of a new RankingTree
 	 */
-	constructor(teamOrder: ArrayList<Int>) {
+	constructor(teamOrder: ArrayList<Int>) : this() {
 		for (i in teamOrder.indices) {
 			ranks[teamOrder[i]] = teamOrder.size - i
 		}
 	}
-
-	/**
-	 * @return The number of nodes currently in the tree
-	 */
-	val numberOfNodes: Int
-		get() = ranks.keys.size
-
-	/**
-	 * @return A deep copy of the HashMap that is the foundation of the tree
-	 * Useful for creating a duplicate tree for backup.
-	 */
-	val treeHashMap: HashMap<Int, Int>
-		get() = ranks.clone() as HashMap<Int, Int>
-
+	
+	constructor(ranks: HashMap<Int, Int>) : this() {
+		this.ranks = ranks.clone() as HashMap<Int, Int>
+	}
+	
 	/**
 	 * Creates a new node at level 0
 	 *
@@ -53,7 +44,9 @@ class RankingTree {
 			ranks[teamNum] = 0
 		}
 	}
-
+	
+	val treeHashMap: HashMap<Int, Int> get() = ranks.clone() as HashMap<Int, Int>
+	
 	/**
 	 * @param teamNum The node label to be queried
 	 * @return true if there is a node in the tree labeled with teamNum, false otherwise
@@ -61,7 +54,7 @@ class RankingTree {
 	fun containsNode(teamNum: Int): Boolean {
 		return ranks.containsKey(teamNum)
 	}
-
+	
 	/**
 	 * Creates a new node at the specified level
 	 *
@@ -80,10 +73,9 @@ class RankingTree {
 	 * @param level   The desired level of the node
 	 */
 	private fun setLevel(teamNum: Int, level: Int) {
-		var level = level
-		level = Math.max(level, 0)
+		val level = level.coerceAtLeast(0)
 		ranks[teamNum] = level
-		maxLevel = Math.max(maxLevel, level)
+		maxLevel = maxLevel.coerceAtLeast(level)
 	}
 
 	/**
@@ -245,5 +237,11 @@ class RankingTree {
 			}
 		}
 		setLevel(teamNum, getLevel(teamNum) - 1)
+	}
+	
+	public override fun clone(): RankingTree {
+		val clone = RankingTree()
+		clone.ranks = this.ranks.clone() as HashMap<Int, Int>
+		return clone
 	}
 }
