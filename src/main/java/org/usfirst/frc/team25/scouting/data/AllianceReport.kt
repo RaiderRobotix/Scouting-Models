@@ -104,7 +104,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
             for (metric in metricSets[i]) {
                 var expectedValue = 0.0
                 for (report in teamReports) {
-                    expectedValue += report.getAverage(prefixes[i] + metric.name)
+                    expectedValue += report.stats[prefixes[i] + metric.name]!!.mean
                 }
                 expectedValues[prefixes[i] + metric.name] = expectedValue
             }
@@ -335,8 +335,8 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
 // attempt-success rate's standard deviation
         for (i in bestStartingLevels.indices) {
             sandstormBonusVariance += Stats.multiplyVariance(bestStartingLevels[i] * 3.toDouble(),
-                    teamReports[i].getStandardDeviation("level" + numStrNames[bestStartingLevels[i] - 1] +
-                            "Cross"))
+	            teamReports[i].stats["level" + numStrNames[bestStartingLevels[i] - 1] +
+		            "Cross"]!!.standardDeviation)
         }
         // Recall that standard deviation of a metric is the square root of its variance
         standardDeviations["sandstormBonus"] = sqrt(sandstormBonusVariance)
@@ -344,12 +344,12 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
         var sandstormHatchVariance = 0.0
         for (i in bestSandstormGamePieceCombo!!.indices) {
             if (bestSandstormGamePieceCombo!![i] == 'H') {
-                sandstormGamePieceVariance += Stats.multiplyVariance(5.0, teamReports[i].getStandardDeviation(
-                        "hatchAutoSuccess"))
-                sandstormHatchVariance += teamReports[i].getStandardDeviation("hatchAutoSuccess").pow(2)
+	            sandstormGamePieceVariance += Stats.multiplyVariance(5.0, teamReports[i].stats[
+		            "hatchAutoSuccess"]!!.standardDeviation)
+	            sandstormHatchVariance += teamReports[i].stats["hatchAutoSuccess"]!!.standardDeviation.pow(2)
             } else {
-                sandstormGamePieceVariance += Stats.multiplyVariance(3.0, teamReports[i].getStandardDeviation(
-                        "cargoAutoSuccess"))
+	            sandstormGamePieceVariance += Stats.multiplyVariance(3.0, teamReports[i].stats[
+		            "cargoAutoSuccess"]!!.standardDeviation)
             }
         }
         standardDeviations["autoCargoShipHatches"] = sqrt(sandstormHatchVariance)
@@ -465,7 +465,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
         // Adds the variance for each team
         for (i in bestClimbLevels.indices) {
             endgameVariance += Stats.multiplyVariance(climbPointValues[bestClimbLevels[i] - 1].toDouble(),
-                    teamReports[i].getStandardDeviation("level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"))
+	            teamReports[i].stats["level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"]!!.standardDeviation)
         }
         val endgameStdDev = sqrt(endgameVariance)
         standardDeviations["endgamePoints"] = endgameStdDev

@@ -1,14 +1,13 @@
 package org.usfirst.frc.team25.scouting.data
 
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 import org.usfirst.frc.team25.scouting.data.StringProcessing.removeCommasBreaks
 import org.usfirst.frc.team25.scouting.data.models.Autonomous
 import org.usfirst.frc.team25.scouting.data.models.ScoutEntry
 import org.usfirst.frc.team25.scouting.data.models.TeleOp
 import java.io.File
 import java.util.*
-
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 import kotlin.collections.HashMap
 
 /**
@@ -29,6 +28,8 @@ class TeamReport(val teamNum: Int) {
 	private val counts = HashMap<String, Int>()
 	private val abilities = HashMap<String, Boolean>()
 	private val statistics = HashMap<String, StatisticalSummary>()
+	
+	val stats = Collections.unmodifiableMap(statistics)
 	
 	
 	/**
@@ -216,12 +217,7 @@ class TeamReport(val teamNum: Int) {
 	 * @param metric String name of the desired metric
 	 * @return The value of the ability metric, false if the metric name does not exist
 	 */
-	fun getAbility(metric: String): Boolean = abilities[metric] ?: false
-	
-	
-	fun getAverage(metric: String): Double = statistics[metric]?.mean ?: 0.0
-	
-	fun getStandardDeviation(metric: String): Double = statistics[metric]?.standardDeviation ?: 0.0
+	fun getAbility(metric: String): Boolean = abilities[metric]!!
 	
 	fun getAttemptSuccessRate(metric: String?): Double = attemptSuccessRates[metric]!!
 	
