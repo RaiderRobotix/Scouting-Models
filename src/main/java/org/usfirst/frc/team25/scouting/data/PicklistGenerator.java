@@ -7,7 +7,10 @@ import org.usfirst.frc.team25.scouting.data.models.ScoutEntry;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to create various picklists with different methodologies
@@ -260,8 +263,8 @@ public class PicklistGenerator {
 
             potentialAllianceTeams.add(currentTeamReport);
 
-            double dysfunctionalPercent =
-                    (double) currentTeamReport.getCount("dysfunctional") / (currentTeamReport.getCount("noShow") + currentTeamReport.getEntries().size());
+	        double dysfunctionalPercent =
+			        (double) currentTeamReport.getCounts().get("dysfunctional") / (currentTeamReport.getCounts().get("noShow") + currentTeamReport.getEntries().size());
 
             double pointValue =
                     (1 - dysfunctionalPercent) * (new AllianceReport(potentialAllianceTeams).getPredictedValue(

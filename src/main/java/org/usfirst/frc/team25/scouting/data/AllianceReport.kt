@@ -104,7 +104,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
             for (metric in metricSets[i]) {
                 var expectedValue = 0.0
                 for (report in teamReports) {
-                    expectedValue += report.stats[prefixes[i] + metric.name]!!.mean
+                    expectedValue += report.statistics[prefixes[i] + metric.name]!!.mean
                 }
                 expectedValues[prefixes[i] + metric.name] = expectedValue
             }
@@ -137,9 +137,9 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
             var crossingScore = 0.0
             for (i in levelCombo.indices) { // Multiply by attempt-success rates here to get the true expected value per team
                 crossingScore += if (levelCombo[i] == 1) {
-                    3.0 * teamReports[i].getAttemptSuccessRate("levelOneCross")
+	                3.0 * teamReports[i].statistics["levelOneCross"]!!.mean
                 } else {
-                    6.0 * teamReports[i].getAttemptSuccessRate("levelTwoCross")
+	                6.0 * teamReports[i].statistics["levelTwoCross"]!!.mean
                 }
             }
             if (crossingScore >= bestCrossingScore) {
@@ -173,15 +173,15 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
             for (i in gamePieceCombo.indices) {
                 if (gamePieceCombo[i] == 'H') { // Validate assignments here
                     if (teamReports[i].getAbility("sideCargoShipHatchSandstorm")) {
-                        cargoShipHatches += teamReports[i].getAttemptSuccessRate("hatchAutoSuccess")
+	                    cargoShipHatches += teamReports[i].statistics["hatchAutoSuccess"]!!.mean
                     } else if (teamReports[i].getAbility("frontCargoShipHatchSandstorm") && frontCargoShipCount < 2) {
-                        cargoShipHatches += teamReports[i].getAttemptSuccessRate("hatchAutoSuccess")
+	                    cargoShipHatches += teamReports[i].statistics["hatchAutoSuccess"]!!.mean
                         frontCargoShipCount++
                     } else if (teamReports[i].getAbility("rocketHatchSandstorm")) {
-                        rocketHatches += teamReports[i].getAttemptSuccessRate("hatchAutoSuccess")
+	                    rocketHatches += teamReports[i].statistics["hatchAutoSuccess"]!!.mean
                     }
                 } else {
-                    cargoShipCargo += teamReports[i].getAttemptSuccessRate("cargoAutoSuccess")
+	                cargoShipCargo += teamReports[i].statistics["cargoAutoSuccess"]!!.mean
                 }
             }
             val gamePieceScore = 5 * cargoShipHatches + 3 * cargoShipCargo + 2 * rocketHatches
@@ -300,8 +300,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
             var endgamePoints = 0.0
             // Iterate through each team on the alliance
             for (i in climbLevelCombo.indices) {
-                endgamePoints += climbPointValues[climbLevelCombo[i] - 1] * teamReports[i].getAttemptSuccessRate(
-                        "level" + numStrNames[climbLevelCombo[i] - 1] + "Climb")
+	            endgamePoints += climbPointValues[climbLevelCombo[i] - 1] * teamReports[i].statistics["level" + numStrNames[climbLevelCombo[i] - 1] + "Climb"]!!.mean
             }
             if (endgamePoints >= bestEndgamePoints) {
                 bestEndgamePoints = endgamePoints
@@ -335,7 +334,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
 // attempt-success rate's standard deviation
         for (i in bestStartingLevels.indices) {
             sandstormBonusVariance += Stats.multiplyVariance(bestStartingLevels[i] * 3.toDouble(),
-	            teamReports[i].stats["level" + numStrNames[bestStartingLevels[i] - 1] +
+	            teamReports[i].statistics["level" + numStrNames[bestStartingLevels[i] - 1] +
 		            "Cross"]!!.standardDeviation)
         }
         // Recall that standard deviation of a metric is the square root of its variance
@@ -344,11 +343,11 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
         var sandstormHatchVariance = 0.0
         for (i in bestSandstormGamePieceCombo!!.indices) {
             if (bestSandstormGamePieceCombo!![i] == 'H') {
-	            sandstormGamePieceVariance += Stats.multiplyVariance(5.0, teamReports[i].stats[
+	            sandstormGamePieceVariance += Stats.multiplyVariance(5.0, teamReports[i].statistics[
 		            "hatchAutoSuccess"]!!.standardDeviation)
-	            sandstormHatchVariance += teamReports[i].stats["hatchAutoSuccess"]!!.standardDeviation.pow(2)
+	            sandstormHatchVariance += teamReports[i].statistics["hatchAutoSuccess"]!!.standardDeviation.pow(2)
             } else {
-	            sandstormGamePieceVariance += Stats.multiplyVariance(3.0, teamReports[i].stats[
+	            sandstormGamePieceVariance += Stats.multiplyVariance(3.0, teamReports[i].statistics[
 		            "cargoAutoSuccess"]!!.standardDeviation)
             }
         }
@@ -465,7 +464,7 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
         // Adds the variance for each team
         for (i in bestClimbLevels.indices) {
             endgameVariance += Stats.multiplyVariance(climbPointValues[bestClimbLevels[i] - 1].toDouble(),
-	            teamReports[i].stats["level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"]!!.standardDeviation)
+	            teamReports[i].statistics["level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"]!!.standardDeviation)
         }
         val endgameStdDev = sqrt(endgameVariance)
         standardDeviations["endgamePoints"] = endgameStdDev
@@ -546,9 +545,11 @@ class AllianceReport(teamReports: ArrayList<TeamReport>) {
 // rates
                         for (i in 0..2) {
                             probabilityIteration *= if (climbStatus[i] == 1) {
-                                teamReports[i].getAttemptSuccessRate("level" + numStrNames[bestClimbLevels[i] - 1] + "Climb")
+	                            (teamReports[i].statistics["level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"]
+		                            ?: error("")).mean
                             } else {
-                                1 - teamReports[i].getAttemptSuccessRate("level" + numStrNames[bestClimbLevels[i] - 1] + "Climb")
+	                            1 - (teamReports[i].statistics["level" + numStrNames[bestClimbLevels[i] - 1] + "Climb"]
+		                            ?: error("")).mean
                             }
                         }
                         climbRpChance += probabilityIteration

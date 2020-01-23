@@ -23,59 +23,24 @@ class TeamReport(val teamNum: Int) {
 		private set
 	private var frequentCommentStr = ""
 	private var allComments: String? = null
-	private val frequentComments = ArrayList<String>()
-	private val attemptSuccessRates = HashMap<String, Double>()
-	private val counts = HashMap<String, Int>()
-	private val abilities = HashMap<String, Boolean>()
-	private val statistics = HashMap<String, StatisticalSummary>()
-	
-	val stats = Collections.unmodifiableMap(statistics)
-	
-	
-	/**
-	 * Processes the scout entries within the team report by filtering out no shows, calculating stats, and finding
-	 * abilities and frequent comments
-	 */
-	fun processReport() {
-		filterNoShow()
-		findFrequentComments()
-		calculateStats()
-		findAbilities()
-	}
-	
-	/**
-	 * Removes scouting entries where the robot did not show up and increments the "no show" and "dysfunctional" counts
-	 */
-	private fun filterNoShow() {
-		entries.removeIf { it.preMatch.noShow }
-	}
-	
-	/**
-	 * Increments a count metric by 1 and creates it if it currently does not exist
-	 *
-	 * @param metricName The count metric to increment
-	 */
-	private fun incrementCount(metricName: String) {
-		if (counts.containsKey(metricName)) {
-			counts[metricName] = getCount(metricName) + 1
-		} else {
-			counts[metricName] = 1
+	private val frequentComments = mutableListOf<String>()
+	var counts = mapOf<String, Int>()
+		private set
+	private val abilities by lazy {
+		val abilities = mutableMapOf(
+			"cargoFloorIntake" to frequentComments.contains("Cargo floor intake"),
+			"hatchPanelFloorIntake" to frequentComments.contains("Hatch panel floor intake")
+		)
+		
+		for (entry in entries) {
+			if (entry.autonomous.crossInitLine) // Example code to calculate if a skill is present
+				abilities["crossInitLine"] = true
 		}
+		abilities.toMap()
 	}
 	
-	/**
-	 * Retrieves the value of the specified count metric
-	 *
-	 * @param metric String name of the desired metric
-	 * @return The value of the count metric, 0 if the metric name does not exist
-	 */
-	fun getCount(metric: String): Int = counts[metric] ?: 0
-	
-	/**
-	 * Calculates the counts, averages, standard deviations, and attempt-success rates of data in stored scouting
-	 * entries, provided that data exists
-	 */
-	private fun calculateStats() {
+	val statistics: Map<String, StatisticalSummary> by lazy {
+		val statistics = mutableMapOf<String, StatisticalSummary>()
 		fun <T> Collection<T>.toDoubles() = when (first()) {
 			is Number -> (this as Collection<Int>).map { it.toDouble() }
 			is Boolean -> (this as Collection<Boolean>).map { if (it) 1.0 else 0.0 }
@@ -90,17 +55,41 @@ class TeamReport(val teamNum: Int) {
 		}
 		
 		val teleList = entries.map { it.teleOp }
-		for (prop in TeleOp::class.members) {
+		for (prop in teleMetrics) {
 			val summaryStatistics = SummaryStatistics()
 			teleList.map { prop.call(it) }.toDoubles()?.forEach(summaryStatistics::addValue)
 			statistics["tele${prop.name}"] = summaryStatistics.summary
 		}
 		
-		for (prop in ScoutEntry::class.members) {
+		for (prop in overallMetrics) {
 			val summaryStatistics = SummaryStatistics()
 			entries.map { prop.call(it) }.toDoubles()?.forEach(summaryStatistics::addValue)
 			statistics[prop.name] = summaryStatistics.summary
 		}
+		statistics
+	}
+	
+	/**
+	 * Processes the scout entries within the team report by filtering out no shows, calculating stats, and finding
+	 * abilities and frequent comments
+	 */
+	fun processReport() {
+		findFrequentComments()
+	}
+	
+	/**
+	 * Increments a count metric by 1 and creates it if it currently does not exist
+	 *
+	 * @param metric The count metric to increment
+	 */
+	private fun incrementCount(metric: String) {
+		counts = counts.toMutableMap().apply {
+			if (containsKey(metric)) {
+				this[metric] = this[metric]!! + 1
+			} else {
+				this[metric] = 1
+			}
+		}.toMap()
 	}
 	
 	/**
@@ -133,19 +122,6 @@ class TeamReport(val teamNum: Int) {
 			if (entry.postMatch.robotComment != "") {
 				allComments += entry.postMatch.robotComment + "; "
 			}
-		}
-	}
-	
-	/**
-	 * Determines if teams are capable of intaking game pieces from the floor and their potential sandstorm and climb
-	 * modes
-	 */
-	private fun findAbilities() {
-		abilities["cargoFloorIntake"] = frequentComments.contains("Cargo floor intake")
-		abilities["hatchPanelFloorIntake"] = frequentComments.contains("Hatch panel floor intake")
-		for (entry in entries) { //            if (entry.autonomous().isSkillCapable()) {
-//                abilities.put(SkillCapable,true)
-//            }
 		}
 	}
 	
@@ -185,14 +161,16 @@ class TeamReport(val teamNum: Int) {
 	 * @param entry `ScoutEntry` to be added to this team report
 	 */
 	fun addEntry(entry: ScoutEntry) {
-		// sanitize user input before adding entry
-		entries.add(
-			entry.copy( // All the data classes are intentionally immutable!
-				postMatch = entry.postMatch.copy(
-					robotComment = entry.postMatch.robotComment.removeCommasBreaks()
+		if (!entry.preMatch.noShow) {
+			// sanitize user input before adding entry
+			entries.add(
+				entry.copy( // All the data classes are intentionally immutable!
+					postMatch = entry.postMatch.copy(
+						robotComment = entry.postMatch.robotComment.removeCommasBreaks()
+					)
 				)
 			)
-		)
+		}
 	}
 	
 	/**
@@ -218,8 +196,6 @@ class TeamReport(val teamNum: Int) {
 	 * @return The value of the ability metric, false if the metric name does not exist
 	 */
 	fun getAbility(metric: String): Boolean = abilities[metric]!!
-	
-	fun getAttemptSuccessRate(metric: String?): Double = attemptSuccessRates[metric]!!
 	
 	companion object {
 		// Metric defined to assist with iterating over values
