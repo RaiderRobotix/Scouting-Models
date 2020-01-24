@@ -5,17 +5,16 @@ package org.usfirst.frc.team25.scouting.data.models
  * Includes endgame data
  */
 data class TeleOp(
-	val cellsScoredBottom: Int,
-	val cellsScoredInner: Int,
-	val cellsScoredOuter: Int,
-	val cellPickupRpoint: Int,
-	val cellPickupTrench: Int,
-	val cellsDropped: Int,
-	val rotationControl: Boolean,
-	val positionControl: Boolean,
-	val attemptHang: Boolean,
-	val successHang: Boolean,
-	val hangAssisted: Boolean,
+	val cellsScoredBottom: Int,//
+	val cellsScoredInner: Int,//
+	val cellsScoredOuter: Int,//
+	val cellsDropped: Int,//
+	val rotationControl: Boolean,//
+	val rotationOverspun: Boolean,//
+	val positionControl: Boolean,//
+	val attemptHang: Boolean,//
+	val rungLevel: Boolean,//
+	val successHang: Boolean,//
 	val assistingClimbTeamNum: Int,
-	val numPartnerClimbAssists: Int
+	val assistedClimbs: Int
 )
