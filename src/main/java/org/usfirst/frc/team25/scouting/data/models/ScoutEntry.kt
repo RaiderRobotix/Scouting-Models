@@ -7,9 +7,4 @@ data class ScoutEntry(
 	val autonomous: Autonomous,
 	val teleOp: TeleOp,
 	val postMatch: PostMatch
-) {
-	val totalCells = 0
-	val cellsDropped = 0
-	val cycles = 0
-	val pointContribution = 0
-}
+)
