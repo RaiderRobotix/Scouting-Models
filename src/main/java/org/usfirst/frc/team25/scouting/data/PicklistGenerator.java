@@ -1,5 +1,6 @@
 package org.usfirst.frc.team25.scouting.data;
 
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.usfirst.frc.team25.scouting.data.models.Comparison;
 import org.usfirst.frc.team25.scouting.data.models.RankingTree;
@@ -64,16 +65,16 @@ public class PicklistGenerator {
 
         // Create list of all comparisons from the scout entries
         for (ScoutEntry entry : scoutEntries) {
-            final var comparison = entry.getPostMatch().getComparison();
+	        val comparison = entry.getPostMatch().getComparison();
 
-            if (!comparison.contains(0)) { //At the beginning of a shift, one team may be set to 0
-                comparisons.add(comparison);
+	        if (!comparison.contains(0)) { //At the beginning of a shift, one team may be set to 0
+		        comparisons.add(comparison);
 
-                //Initialize the ArrayLists inside the HashMap
-                compLookup.putIfAbsent(comparison.getLowerTeam(), new ArrayList<>());
-                compLookup.putIfAbsent(comparison.getHigherTeam(), new ArrayList<>());
-                
-            }
+		        //Initialize the ArrayLists inside the HashMap
+		        compLookup.putIfAbsent(comparison.getLowerTeam(), new ArrayList<>());
+		        compLookup.putIfAbsent(comparison.getHigherTeam(), new ArrayList<>());
+
+	        }
 
             //Generate a list of team numbers
             if (!teamNums.contains(comparison.getLowerTeam()) && comparison.getLowerTeam() != 0) {

@@ -1,6 +1,7 @@
 package org.usfirst.frc.team25.scouting.data;
 
 import com.google.gson.Gson;
+import lombok.var;
 import org.usfirst.frc.team25.scouting.data.models.*;
 
 import java.io.File;

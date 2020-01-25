@@ -6,6 +6,8 @@ import com.thebluealliance.api.v3.TBA;
 import com.thebluealliance.api.v3.models.Event;
 import com.thebluealliance.api.v3.models.Match;
 import com.thebluealliance.api.v3.models.Team;
+import lombok.val;
+import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -99,15 +101,17 @@ public class BlueAlliance {
 			e.printStackTrace();
 			return false;
 		}
-		if (teams.length == 0) { return false; }
-		
+		if (teams.length == 0) {
+			return false;
+		}
+
 		Arrays.sort(teams, SortersFilters.byTeamNum);
-		
+
 		StringJoiner joiner = new StringJoiner(",");
-		for (var team: teams) {
+		for (val team : teams) {
 			joiner.add(Integer.toString(team.getTeamNumber()));
 		}
-		
+
 		FileManager.outputFile(outputDirectory, fileName, "csv", joiner.toString());
 		return true;
 	}
@@ -136,10 +140,10 @@ public class BlueAlliance {
 		}
 		Arrays.sort(teams, SortersFilters.byTeamNum);
 		StringJoiner joiner = new StringJoiner(", \n");
-		for (var team : teams) {
+		for (val team : teams) {
 			joiner.add(team.getTeamNumber() + "," + team.getNickname());
 		}
-		
+
 		FileManager.outputFile(outputDirectory, fileName, "csv", joiner.toString());
 		return true;
 	}
@@ -155,7 +159,7 @@ public class BlueAlliance {
 	 * @throws FileNotFoundException if <code>outputDirectory</code> is invalid
 	 */
 	private static boolean exportMatchList(String eventCode, File outputDirectory, String fileName) throws FileNotFoundException {
-		final var nlJoiner = new StringJoiner(",\n");
+		val nlJoiner = new StringJoiner(",\n");
 		final List<Match> matches;
 		try {
 			matches = Arrays.stream(TBA.eventRequest.getMatches(eventCode))
@@ -168,8 +172,8 @@ public class BlueAlliance {
 		}
 		
 		for (Match match : matches) {
-			final var commaJoiner = new StringJoiner(",");
-			
+			val commaJoiner = new StringJoiner(",");
+
 			commaJoiner.add(Integer.toString(match.getMatchNumber()));
 			for (var team : match.getRedAlliance().getTeamKeys()) {
 				team = team.split("frc")[1];
@@ -197,7 +201,7 @@ public class BlueAlliance {
 	 * @throws IOException if <code>outputDirectory</code> does not exist
 	 */
 	public static void downloadQualificationMatchData(String eventCode, File outputDirectory) throws IOException {
-		var matches = Arrays.stream(TBA.eventRequest.getMatches(eventCode))
+		val matches = Arrays.stream(TBA.eventRequest.getMatches(eventCode))
 				.filter(m -> !m.getCompLevel().equals("qm"))
 				.sorted(SortersFilters.byMatchNum)
 				.collect(Collectors.toList());
