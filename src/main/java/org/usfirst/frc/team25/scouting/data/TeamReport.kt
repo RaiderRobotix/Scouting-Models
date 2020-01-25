@@ -9,6 +9,7 @@ import org.usfirst.frc.team25.scouting.data.models.TeleOp
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.reflect.KProperty1
 
 /**
  * Object model containing individual reports of teams in events and methods to process data and calculate team-based
@@ -214,11 +215,7 @@ class TeamReport(val teamNum: Int) {
 			TeleOp::positionControl,
 			TeleOp::successHang
 		)
-		val overallMetrics = arrayOf(
-			ScoutEntry::cellsDropped,
-			ScoutEntry::cycles,
-			ScoutEntry::pointContribution
-		)
+		val overallMetrics = arrayOf<KProperty1<ScoutEntry, Any>>()
 	}
 	
 }
