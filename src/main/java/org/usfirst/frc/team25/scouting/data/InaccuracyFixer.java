@@ -1,27 +1,22 @@
 package org.usfirst.frc.team25.scouting.data;
 
+import com.thebluealliance.api.v3.models.Match;
+import com.thebluealliance.api.v3.models.MatchScoreBreakdown2019Allliance;
+import lombok.Data;
+import org.usfirst.frc.team25.scouting.data.models.ScoutEntry;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import com.thebluealliance.api.v3.models.Match;
-import com.thebluealliance.api.v3.models.MatchScoreBreakdown2019Allliance;
-
-import org.usfirst.frc.team25.scouting.data.models.ScoutEntry;
-
 /**
  * Class that fixes the inaccurate scout entries found in an event report and outputs a list of inaccuracies
  */
+@Data
 public class InaccuracyFixer {
 
-    private final EventReport eventReport;
-
-    private String inaccuracyList;
-
-    public InaccuracyFixer(EventReport eventReport) {
-        this.eventReport = eventReport;
-        inaccuracyList = "";
-    }
+	private final EventReport eventReport;
+	private String inaccuracyList = "";
 
     /**
      * Fixes errors made in scouting entries based on match details from The Blue Alliance
