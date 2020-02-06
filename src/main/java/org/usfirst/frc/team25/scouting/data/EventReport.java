@@ -1,20 +1,19 @@
 package org.usfirst.frc.team25.scouting.data;
 
 import com.google.gson.Gson;
-import lombok.var;
+import lombok.Data;
 import org.usfirst.frc.team25.scouting.data.models.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Object model holding all data for an event. Responsible for generating event-wide files
  */
+@Data
 public class EventReport {
 
     /**
@@ -22,24 +21,9 @@ public class EventReport {
      */
     private final ArrayList<ScoutEntry> scoutEntries;
     private final String event;
-    private final File directory;
-    private final HashMap<Integer, TeamReport> teamReports;
-    private File teamNameList;
-
-    /**
-     * Constructs an <code>EventReport</code> based on scouting data
-     *
-     * @param entries   List of all scouting entries for that particular event
-     * @param event     Event key of the current event (e.g. <code>2019njfla</code>)
-     * @param directory Working data directory for reading/writing files
-     */
-    public EventReport(ArrayList<ScoutEntry> entries, String event, File directory) {
-        teamReports = new HashMap<>();
-
-        this.scoutEntries = entries;
-        this.event = event;
-        this.directory = directory;
-    }
+	private final File directory;
+	private final HashMap<Integer, TeamReport> teamReports = new HashMap<>();
+	private File teamNameList;
 
     /**
      * Calculates derived stats of each scout entry, populating team reports, and processing team reports.
@@ -95,28 +79,35 @@ public class EventReport {
                 Field[] fields = dataObject.getClass().getDeclaredFields();
 
                 for (Field metric : fields) {
-                    Object metricValue = "";
+	                Object metricValue = "";
 
-                    // Index to account for the substring shift from "is" or "get"
-                    // The correct getter method is later found with this value
-                    var isBoolean = metric.getType() == boolean.class;
+	                // Only the primitives are added to the output entry for now
+	                // Values from HashMaps for quick comments are added later
+	                if (
+			                metric.getType() != boolean.class &&
+					                metric.getType() != int.class &&
+					                metric.getType() != String.class
+	                ) {
+		                continue;
+	                }
 
-                    // Only the primitives are added to the output entry for now
-                    // Values from HashMaps for quick comments are added later
-                    if (!isBoolean && metric.getType() != int.class && metric.getType() != String.class) {
-                        continue;
-                    }
+	                scoutEntries
+			                .stream()
+			                .map(
+					                it -> {
+						                try {
+							                return metric.get(it);
+						                } catch (IllegalAccessException e) {
+							                return null;
+						                }
+					                }
 
-                    try {
-                        // Retrieves the correct getter for the variable, then retrieves its value from the data object
-                        metricValue =
-                                Objects.requireNonNull(getCorrectGetter(dataObject.getClass(), metric.getName(),
-                                    isBoolean)).invoke(dataObject);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+			                )
+			                .forEachOrdered(
+					                it -> entryContents.append(it).append(",")
+			                );
 
-                    entryContents.append(metricValue).append(",");
+	                entryContents.append(metricValue).append(",");
                 }
 
             }
@@ -143,15 +134,6 @@ public class EventReport {
             return false;
         }
         return true;
-    }
-    
-    public static Method getCorrectGetter(Class dataObjectClass, String metricName, boolean isBoolean) {
-        metricName = (isBoolean ? "is" : "get") + Character.toUpperCase(metricName.charAt(0)) + metricName.substring(1);
-        try {
-            return dataObjectClass.getMethod(metricName);
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
     }
 
     /**
