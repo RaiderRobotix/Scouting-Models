@@ -1,7 +1,7 @@
 package org.usfirst.frc.team25.scouting.data.models
 
-import org.usfirst.frc.team25.scouting.data.SortersFilters.sortByValue
 import java.util.*
+import java.util.function.Consumer
 import kotlin.collections.HashMap
 
 /**
@@ -127,7 +127,7 @@ class RankingTree() : Cloneable {
 	 * a node on each line, followed by a comma and its level
 	 */
 	override fun toString(): String {
-		ranks = sortByValue<Int, Int>(ranks)
+		ranks = ranks.sortByValue()
 		val result = StringBuilder()
 		for ((key, value) in ranks) {
 			try {
@@ -146,7 +146,7 @@ class RankingTree() : Cloneable {
 	 */
 	fun toArrayList(): ArrayList<Int> {
 		val result = ArrayList<Int>()
-		ranks = sortByValue<Int, Int>(ranks)
+		ranks = ranks.sortByValue()
 		for ((key) in ranks) {
 			try {
 				result.add(key)
@@ -243,5 +243,13 @@ class RankingTree() : Cloneable {
 		val clone = RankingTree()
 		clone.ranks = this.ranks.clone() as HashMap<Int, Int>
 		return clone
+	}
+	
+	fun <K, V : Comparable<V>?> Map<K, V>.sortByValue(): LinkedHashMap<K, V> {
+		val entries = Vector(this.entries)
+		entries.sortWith(java.util.Map.Entry.comparingByValue())
+		val sorted = LinkedHashMap<K, V>()
+		entries.forEach(Consumer { sorted[it.key] = it.value })
+		return sorted
 	}
 }
