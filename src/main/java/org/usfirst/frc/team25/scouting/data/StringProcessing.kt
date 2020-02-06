@@ -14,8 +14,7 @@ object StringProcessing {
 	 * @return String without commas
 	 */
 	@JvmStatic
-    @Contract(pure = true)
-	fun String.removeCommasBreaks(): String {
-		return replace("[\n,]".toRegex(), "; ")
-	}
+	@Contract(pure = true)
+	fun String.removeCommasBreaks(): String =
+		replace("[\n,]".toRegex(), "; ")
 }

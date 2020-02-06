@@ -14,8 +14,8 @@ object SortersFilters {
 	@JvmField
     val byTeamNum: Comparator<SimpleTeam> = Comparator.comparingInt { obj: SimpleTeam -> obj.teamNumber }
 	@JvmStatic
-    fun <K, V : Comparable<V>?> sortByValue(unsorted: Map<K, V>): LinkedHashMap<K, V> {
-		val entries = Vector(unsorted.entries)
+	fun <K, V : Comparable<V>?> Map<K, V>.sortByValue(): LinkedHashMap<K, V> {
+		val entries = Vector(this.entries)
 		entries.sortWith(java.util.Map.Entry.comparingByValue())
 		val sorted = LinkedHashMap<K, V>()
 		entries.forEach(Consumer { sorted[it.key] = it.value })
