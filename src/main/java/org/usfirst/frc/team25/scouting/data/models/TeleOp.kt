@@ -16,6 +16,6 @@ data class TeleOp(
 	val successHang: Boolean,
 	val rungLevel: Boolean,
 	val assistingClimbTeamNum: Int,
-	val assistedClimbs: Int
+	val assistedClimbs: Int,
 	val parked: Boolean
 )
