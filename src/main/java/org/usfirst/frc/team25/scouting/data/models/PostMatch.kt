@@ -10,9 +10,7 @@ data class PostMatch(
 	val comparison: Comparison,
 	val pickNumber: Int = 0,
 	val robotComment: String,
-	val autoFocus: String,
-	val teleopFocus: String,
-	val climbType: String
+	val teleopFocus: String
 ) {
 	val robotQuickCommentSelections = HashMap<String, Boolean>()
 }
