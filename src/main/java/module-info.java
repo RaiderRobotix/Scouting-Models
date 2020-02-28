@@ -1,3 +1,3 @@
-module com.raiderrobotix.scouting.models {
+module org.raiderrobotix.scouting.models {
 	requires kotlin.stdlib;
 }
