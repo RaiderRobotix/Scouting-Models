@@ -27,6 +27,8 @@ compileTestKotlin {
 def moduleName = "com.raiderrobotix.scouting.models"
 
 compileJava {
+	dependsOn compileKotlin
+	destinationDir = compileKotlin.destinationDir
 	inputs.property("moduleName", moduleName)
 	doFirst {
 		options.compilerArgs = [
